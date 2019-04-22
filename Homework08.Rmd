@@ -76,7 +76,7 @@ Use the code from the Unsupervised Learning lecture to guide you in this homewor
 
 ## Cluster Analysis
 
-```
+``` {r}
 # Scale the data before clustering
 sd.data <- scale(abaloneKeep)
 ```
@@ -85,36 +85,50 @@ PROBLEM 1: Using the scaled data `sd.data` calculate the Euclidean distance betw
 
 ```{r}
 # insert code here
+data.dist <- dist(sd.data)
 ```
 
 PROBLEM 2: Plot the tree, default linkage = 'complete'. Set `labels = abaloneSample$sex` to get the sex labels for the plot.
 
 ```{r}
 # insert code here
+plot(hclust(data.dist), labels = abaloneSample$sex, main = "Complete Linkage", xlab = "", sub = "", ylab = "")
 ```
 
 PROBLEM 3: Plot the tree, using linkage = 'average'. Set `labels = abaloneSample$sex` to get the sex labels for the plot.
 
 ```{r}
 # insert code here
+plot(hclust(data.dist), method = "average", labels = abaloneSample$sex, main = "Average Linkage", xlab = "", sub = "", ylab = "")
+
 ```
 
 PROBLEM 4: Plot the tree, using default linkage = 'single'. Set `labels = abaloneSample$sex` to get the sex labels for the plot.
 
 ```{r}
 # insert code here
+plot(hclust(data.dist), method = "single", labels = abaloneSample$sex, main = "Single Linkage", xlab = "", sub = "", ylab = "")
 ```
 
 PROBLEM 5: Let's use complete linkage and cut into 3 clusters. When running the `table()` line of code use `abaloneSample$sex` to compare the original sexes to the clusters `hc.clusters`.
 
 ```{r}
 # insert code here
+
+hc.out <- hclust(dist(sd.data))
+hc.clusters <- cutree(hc.out, 3)
+table(hc.clusters, abaloneSample$sex)
 ```
 
 PROBLEM 6: Given the results above:
 
 * which cluster(s) did the best job identifying the infants?
+
+Cluseres 1 and 2 did the best job of identifying the infants. 
+
 * which cluster(s) found the adults (M and F)?
+
+Cluster 1 did the mest job of identifying both female and male. 
 
 ## K-Means clustering
 
@@ -122,7 +136,13 @@ PROBLEM 7: Run a K-means clustering with K=3 (same as we did above for the hiera
 
 ```{r}
 # insert code here
+set.seed(40523)
+km.out = kmeans(sd.data, 3, nstart = 20)
+km.clusters = km.out$cluster
+table(km.clusters, hc.clusters)
 ```
+
+Clusters are not similar. 
 
 ## PCA - Principal Components Analysis
 
@@ -130,13 +150,14 @@ PROBLEM 8: Find the principal components of the normalized data, which are compu
 
 ```{r}
 # insert code here
+pr.out <- prcomp(abaloneKeep, scale = TRUE)
 ```
 
 ### Plot of the data points on the first 2 PCs
 
 The code to show the "Scores Plot" on the 1st two PCs (principal components) is provided below.
 
-```
+```{r}
 # colors
 cols=rainbow(length(unique(abaloneSample$sex)))
 
@@ -161,18 +182,22 @@ legend(x = "topleft",
 
 PROBLEM 9: For the "Scores Plot" above, do you see any separation of the 3 sexes by their principal component scores?
 
-_... just answer in your own words here ..._
+_I do not see any separation of the sexes in the score plot above_
 
 PROBLEM 10: Look at the summary of the PCA, run the summary of `pr.out`. What percentage of variance is explained by the first 2 principal components?  
 
 ```{r}
 # insert code here
+summary(pr.out)
 ```
 
+_The cumulative proportion of the variance explained by PC1 and PC2 is 93.7%. PC1 explaings 89.7% of the variances and PC2 explains 4.0% of the variance_
 PROBLEM 11: Plot the "Scree" plot
 
 ```{r}
 # insert code here
+pve = 100*pr.out$sdev^2/sum(pr.out$sdev^2)
+plot(pve, type = "o", ylab = "Cumulative PVE", xlab = "Principal Component", col="blue")
 ```
 
 ## MDS - Multidimensional Scaling
@@ -181,18 +206,27 @@ PROBLEM 12: Compute the Euclidean distance between each pair of points for `abal
 
 ```{r}
 # insert code here
+data.dist2 <- dist(abaloneKeep)
 ```
 
 PROBLEM 13: Run `cmdscale()` function to perform a Classical Metric MDS, set `eig-TRUE` and `k=2`. Save the results in an object named `fit`. View the results for `fit`.
 
 ```{r}
 # insert code here
+fit <- cmdscale(data.dist2, eig=TRUE, k=2)
+fit
 ```
 
 PROBLEM 14: Plot the MDS fit results, set `labels = abaloneSample$sex`.
 
 ```{r}
 # insert code here
+x <- fit$points[,1]
+y <- fit$points[,2]
+
+plot(x, y, xlab = "PCo1", ylab = "PCo2",
+     main = "Metric MDS", type = "n")
+text(x, y, labels = abaloneSample$sex, cex = 0.7)
 ```
 
 
